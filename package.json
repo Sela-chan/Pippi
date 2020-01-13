@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/Sela-chan/Pippi#readme",
   "dependencies": {
-    "discord.js": "^11.5.1"
+    "discord.js": "^11.5.1",
+    "node-fetch": "^2.6.0",
+    "quick.db": "^7.0.0-b22"
   }
 }
