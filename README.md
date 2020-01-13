@@ -1,0 +1,2 @@
+# Pippi
+osu!Discord Bot
