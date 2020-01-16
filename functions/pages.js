@@ -1,5 +1,5 @@
 module.exports = {
-   pagesGeneral: async (msg, embed, page, pages) => {
+   pagesGeneral: async (msg, embed, page, pages, imgs) => {
       msg.channel.send(embed)
          .then(async m => {
             await m.react('◀')
@@ -13,6 +13,7 @@ module.exports = {
                   if (page === 1) return;
                   page--;
                   embed.setDescription(pages[page-1])
+                     .setImage(imgs[page-1])
                      .setFooter(`Página ${page} de ${pages.length}`);
                   m.edit(embed);
                });
