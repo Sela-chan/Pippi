@@ -21,6 +21,7 @@ module.exports = {
                   if (page === pages.length) return;
                   page++;
                   embed.setDescription(pages[page-1])
+                     .setImage(imgs[page-1])
                      .setFooter(`Página ${page} de ${pages.length}`);
                   m.edit(embed);
                });
