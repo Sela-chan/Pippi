@@ -1,11 +1,7 @@
 const { RichEmbed } = require('discord.js');
 const bd = require('quick.db');
-const fs = require('fs');
 const fetch = require('node-fetch');
 const deleteMsg = require('../functions/deleteMsg');
-const getRankEM = require('../functions/osuRanks');
-const wip = require('../functions/wip');
-const { osuE } = require('../functions/emojis');
 const { prefix, osu } = require('../functions/settings');
 const { put } = require('../functions/misc');
 module.exports = {
@@ -20,8 +16,8 @@ module.exports = {
       bd.delete(`tempOsuInfo`);
       bd.delete(`tempImageBG`);
       bd.delete(`temp.osu`);
-      if (args[args.length-1].toLowerCase() !== '-ripple') {
-         if (args[0].toLowerCase() === '-set') {
+      if (args[args.length-1] !== '-ripple') {
+         if (args[0] === '-set') {
             if (!args[1]) {
                deleteMsg(msg, 5000);
                msg.channel.send('Debes escribir el nombre de usuario que deseas predeterminar.')
@@ -42,15 +38,19 @@ module.exports = {
                   .setTitle('¡Listo!')
                   .setThumbnail(msg.author.displayAvatarURL)
                   .setColor(put.green)
-                  .addField('Nuevo nombre de usuario definido para <:osu:666406623232655370>', x.username)
+                  .addField('Nuevo nombre de usuario definido para <:EBosu:666406623232655370>', x.username)
                   .setTimestamp())
                   .then(m => deleteMsg(m, 5000));
-            }).catch(() => msg.channel.send(`Parece que el nombre de usuario **${username}** no existe en <:osu:666406623232655370>\n*Asegúrate de haberlo escrito bien.*`)
+            }).catch(() => msg.channel.send(`Parece que el nombre de usuario **${username}** no existe en <:EBosu:666406623232655370>\n*Asegúrate de haberlo escrito bien.*`)
                .then(m => deleteMsg(m, 5000)));
             return;
          }
-         if (args[0].toLowerCase() === '-top') {
-            require('./top/osu')(msg, args);
+         if (args[0] === '-top') {
+            require('./top/osu')(pippi, msg, args, 0);
+            return;
+         }
+         if (args[0] === '-recent') {
+            require('./recent/osu')(pippi, msg, args, 0);
             return;
          }
          if (!args[0]) {
@@ -109,7 +109,7 @@ module.exports = {
                      .addField('Horas jugadas', `**${Math.floor(parseInt(x.total_seconds_played) / 3600)}**`, true)
                      .setFooter(`Se unió el ${x.join_date}`);
                   msg.channel.send(embed);
-               }).catch(() => msg.channel.send(`No he podido encontrar a **${username}** en <:osu:666406623232655370>`)
+               }).catch(() => msg.channel.send(`No he podido encontrar a **${username}** en <:EBosu:666406623232655370>`)
                                  .then(m => deleteMsg(m, 5000)));
             return;
          }

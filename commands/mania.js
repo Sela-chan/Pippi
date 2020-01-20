@@ -1,14 +1,15 @@
-const { RichEmbed } = require('discord.js');
+const { RichEmbed, Client } = require('discord.js');
 const bd = require('quick.db');
 const fetch = require('node-fetch');
 const deleteMsg = require('../functions/deleteMsg');
 const { prefix, osu } = require('../functions/settings');
 const { put } = require('../functions/misc');
+const pippi = new Client();
 
 module.exports = {
    name: "mania",
    aliases: [],
-   usage: `${prefix}mania [opciones] [búsqueda]`,
+   usage: `${prefix(pippi)}mania [opciones] [búsqueda]`,
    category: "osu!",
    perms: [],
    description: `Información osu!Mania`,
@@ -42,11 +43,19 @@ module.exports = {
                .then(m => deleteMsg(m, 5000)));
             return;
          }
+         if (args[0] === '-top') {
+            require('./top/mania')(pippi, msg, args, 3);
+            return;
+         }
+         if (args[0] === '-recent') {
+            require('./recent/mania')(pippi, msg, args, 3);
+            return;
+         }
          if (!args[0]) {
             let maniaUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
             if (maniaUser === null || maniaUser === undefined) {
                deleteMsg(msg, 6000);
-               msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${prefix}mania -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
+               msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${prefix(pippi)}mania -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
                   .then(m => deleteMsg(m, 5500));
                return;
             }
@@ -166,7 +175,7 @@ module.exports = {
          let osuUser = await bd.fetch(`ripple.ripple.${msg.author.id}.username`);
          if (osuUser === null || osuUser === undefined) {
             deleteMsg(msg, 6000);
-            msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${prefix}mania -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
+            msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${prefix(pippi)}mania -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
                .then(m => deleteMsg(m, 5500));
             return;
          }
