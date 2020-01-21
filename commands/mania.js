@@ -9,11 +9,12 @@ const pippi = new Client();
 module.exports = {
    name: "mania",
    aliases: [],
-   usage: `${prefix(pippi)}mania [opciones] [búsqueda]`,
+   usage: `${`${pippi.user} `}mania [opciones] [búsqueda]`,
    category: "osu!",
    perms: [],
    description: `Información osu!Mania`,
    run: async (pippi, msg, args, ops) => {
+      msg.content = msg.content.replace(/<@!652211403683397641>/g, '');
       if (args[args.length-1] !== '-ripple') {
          if (args[0] === '-set') {
             if (!args[1]) {
@@ -55,7 +56,7 @@ module.exports = {
             let maniaUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
             if (maniaUser === null || maniaUser === undefined) {
                deleteMsg(msg, 6000);
-               msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${prefix(pippi)}mania -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
+               msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}mania -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
                   .then(m => deleteMsg(m, 5500));
                return;
             }
@@ -175,7 +176,7 @@ module.exports = {
          let osuUser = await bd.fetch(`ripple.ripple.${msg.author.id}.username`);
          if (osuUser === null || osuUser === undefined) {
             deleteMsg(msg, 6000);
-            msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${prefix(pippi)}mania -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
+            msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}mania -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
                .then(m => deleteMsg(m, 5500));
             return;
          }

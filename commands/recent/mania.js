@@ -12,7 +12,7 @@ module.exports = async (pippi, msg, args, mode) => {
       let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
       if (osuUser === null || osuUser === undefined) {
          deleteMsg(msg, 5000);
-         msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${prefix(pippi)}mania -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
+         msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${pippi.user} mania -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
             .then(m => deleteMsg(m, 5500));
          return;
       }

@@ -9,8 +9,8 @@ pippi.on('ready', () => {
 });
 
 pippi.on('message', async msg => {
-   if (!msg.content.startsWith(prefix)) return;
-   let args = msg.content.slice(prefix.length).trim().split(/ +/g);
+   if (msg.mentions.users.first() !== pippi.user) return;
+   let args = msg.content.slice(`${pippi.user} `.length).trim().split(/ +/g);
    let cmd = args.shift().toLowerCase();
    let command = pippi.commands.get(cmd) || pippi.commands.find(c => c.aliases.includes(cmd));
    if (!command) return;
