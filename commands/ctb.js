@@ -37,11 +37,15 @@ module.exports = {
                   .setTitle('¡Listo!')
                   .setThumbnail(msg.author.displayAvatarURL)
                   .setColor(put.green)
-                  .addField('Nuevo nombre de usuario definido para <:osu:657311734654304286>', x.username)
+                  .addField('Nuevo nombre de usuario definido para <:EBosu:657311734654304286>', x.username)
                   .setTimestamp())
                   .then(m => deleteMsg(m, 5000));
-            }).catch(() => msg.channel.send(`Parece que el nombre de usuario **${username}** no existe en <:osu:657311734654304286>\n*Asegúrate de haberlo escrito bien.*`)
+            }).catch(() => msg.channel.send(`Parece que el nombre de usuario **${username}** no existe en <:EBosu:657311734654304286>\n*Asegúrate de haberlo escrito bien.*`)
                .then(m => deleteMsg(m, 5000)));
+            return;
+         }
+         if (args[0] === '-top') {
+            require('./top/ctb')(pippi, msg, args, 2);
             return;
          }
          if (!args[0]) {
@@ -76,7 +80,7 @@ module.exports = {
                });
             return;
          }
-         let member = msg.mentions.members.first();
+         let member = msg.mentions.members.filter(m => m.id !== pippi.user.id).first();
          if (!member) {
             let username = args.slice(0).join(' ');
             let url = `https://osu.ppy.sh/api/get_user?u=${username}&k=${osu.key}&m=2`;
@@ -100,7 +104,7 @@ module.exports = {
                      .addField('Horas jugadas', `**${Math.floor(parseInt(x.total_seconds_played) / 3600)}**`, true)
                      .setFooter(`Se unió el ${x.join_date}`);
                   msg.channel.send(embed);
-               }).catch(() => msg.channel.send(`No he podido encontrar a **${username}** en <:osu:657311734654304286>`)
+               }).catch(() => msg.channel.send(`No he podido encontrar a **${username}** en <:EBosu:657311734654304286>`)
                                  .then(m => deleteMsg(m, 5000)));
             return;
          }
@@ -195,7 +199,7 @@ module.exports = {
             });
          return;
       }
-      let member = msg.mentions.members.first();
+      let member = msg.mentions.members.filter(m => m.id !== pippi.user.id).first();
       if (!member) {
          let username = args.slice(0).join(' ');
          let url = `http://ripple.moe/api/get_user?u=${username}&m=2`;

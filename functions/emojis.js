@@ -17,6 +17,10 @@ module.exports = {
       mhit200: "<:EBmaniahit200:668920145313529886> ",
       mhit100: "<:EBmaniahit100:668920145124524062> ",
       mhit50: "<:EBmaniahit50:668920145200283648> ",
-      mhit0: "<:EBmaniahit0:668920145279844382>"
+      mhit0: "<:EBmaniahit0:668920145279844382>",
+      fruit: "<:EBfruit:671463132090204161>",
+      fdrop: "<:EBfruitdrop:671463132161376269>",
+      fminidrop: "<:EBfruitdropmini:671463132207775794>",
+      fmiss: "<:EBhit0:664652918095478785>"
    }
 }

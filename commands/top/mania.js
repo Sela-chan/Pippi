@@ -1,677 +1,29 @@
 const { RichEmbed } = require('discord.js');
 const bd = require('quick.db');
-const request = require('request');
+const nosu = require('node-osu');
 const deleteMsg = require('../../functions/deleteMsg');
 const { pagesGeneral } = require('../../functions/pages');
-// const wip = require('../../functions/wip');
 const { osuE } = require('../../functions/emojis');
-const { prefix, osu/*, owner*/ } = require('../../functions/settings');
+const { osu } = require('../../functions/settings');
+const osuApi = new nosu.Api(osu.key, { completeScores: true, notFoundAsError: true });
 
 module.exports = async (pippi, msg, args, mode) => {
-   // if (msg.author.id !== owner.id) return wip(msg);
    if (!args[1]) {
       let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
       if (osuUser === null || osuUser === undefined) {
-         deleteMsg(msg, 6000);
+         deleteMsg(msg, 5000);
          msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${pippi.user} osu -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
             .then(m => deleteMsg(m, 5500));
          return;
       }
-      deleteMsg(msg);
-      let limit = 10;
-      let url = `https://osu.ppy.sh/api/get_user_best?u=${osuUser}&` +
-      `k=${osu.key}&limit=${limit}&m=${mode}`;
-      request(url,
-      { json: true }, async (e, res, body) => {
-               if (e) return;
-               let i = 0;
-               let page = 1;
-               let info = res.body;
-               let url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                  if (e2) return;
-                  let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                  info[i].rank === 'SH' ? osuE.SH :
-                  info[i].rank === 'X' ? osuE.X :
-                  info[i].rank === 'S' ? osuE.S :
-                  info[i].rank === 'A' ? osuE.A :
-                  info[i].rank === 'B' ? osuE.B :
-                  info[i].rank === 'C' ? osuE.C :
-                  info[i].rank === 'F' ? osuE.D : '';
-                  let info2 = res2.body[0];
-                  let bmID = info2.beatmapset_id;
-                  i = 0;
-                  let desc1 = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                  ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                  
-                  let pages = [];
-                  let imgs = [];
-                  pages.push(desc1);
-                  imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                  i = 1;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     i = 1;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     
-                     pages.push(desc);
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 2;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     i = 2;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     
-                     pages.push(desc);
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 3;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     i = 3;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     
-                     pages.push(desc);
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 4;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 4;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 5;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 5;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 6;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 6;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 7;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 7;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 8;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 8;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 9;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 9;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     request(`https://osu.ppy.sh/api/get_user?u=${osuUser}&k=${osu.key}&m=${mode}`,
-                     { json: true }, async (e3, res3, body3) => {
-                        if (e3) return;
-                        let userInfo = res3.body[0];
-                        pages.push(desc);
-                        const embed = new RichEmbed()
-                           .setAuthor(`Mejores rendimientos en osu!Mania de ${userInfo.username}`, `https://osu.ppy.sh/images/flags/${userInfo.country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${userInfo.user_id}/mania`)
-                           .setThumbnail(`https://a.ppy.sh/${userInfo.user_id}`)
-                           .setImage(imgs[page-1])
-                           .setColor(msg.member.displayHexColor === '#000000' ? '#FF87B3' : msg.member.displayHexColor)
-                           .setDescription(pages[page-1])
-                           .setFooter(`Página ${page} de ${pages.length}`)
-                           .setTimestamp();
-                        pagesGeneral(msg, embed, page, pages, imgs);
-                     });
-               });
-               });
-               });
-               });
-               });
-               });
-               });
-               });
-               });
-               });
-      });
-      return;
-   }
-   let member = msg.mentions.members.first();
-   if (!member) {
-      let osuUser = args.slice(1).join(' ');
-      let limit = 10;
-      let url = `https://osu.ppy.sh/api/get_user_best?u=${osuUser}&` +
-      `k=${osu.key}&limit=${limit}&m=${mode}`;
-      request(url,
-      { json: true }, async (e, res, body) => {
-               if (e) return;
-               let i = 0;
-               let page = 1;
-               let info = res.body;
-               if (info.length < 1) {
-                  deleteMsg(msg, 5000);
-                  msg.channel.send(`Parece que **${osuUser}** no existe en <:EBosu:666406623232655370>.`)
-                     .then(m => deleteMsg(m, 4500));
-                  return;
-               }
-               deleteMsg(msg);
-               let url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                  if (e2) return;
-                  let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                  info[i].rank === 'SH' ? osuE.SH :
-                  info[i].rank === 'X' ? osuE.X :
-                  info[i].rank === 'S' ? osuE.S :
-                  info[i].rank === 'A' ? osuE.A :
-                  info[i].rank === 'B' ? osuE.B :
-                  info[i].rank === 'C' ? osuE.C :
-                  info[i].rank === 'F' ? osuE.D : '';
-                  let info2 = res2.body[0];
-                  let bmID = info2.beatmapset_id;
-                  i = 0;
-                  let desc1 = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                  ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                  
-                  let pages = [];
-                  let imgs = [];
-                  pages.push(desc1);
-                  imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                  i = 1;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     i = 1;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     
-                     pages.push(desc);
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 2;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     i = 2;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     
-                     pages.push(desc);
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 3;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     i = 3;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     
-                     pages.push(desc);
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 4;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 4;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 5;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 5;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 6;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 6;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 7;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 7;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 8;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 8;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     pages.push(desc);
-                     i = 9;
-               url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-               await request(url2,
-               { json: true }, async (e2, res2, body2) => {
-                     if (e2) return;
-                     let rankE = info[i].rank === 'XH' ? osuE.XH : 
-                     info[i].rank === 'SH' ? osuE.SH :
-                     info[i].rank === 'X' ? osuE.X :
-                     info[i].rank === 'S' ? osuE.S :
-                     info[i].rank === 'A' ? osuE.A :
-                     info[i].rank === 'B' ? osuE.B :
-                     info[i].rank === 'C' ? osuE.C :
-                     info[i].rank === 'F' ? osuE.D : '';
-                     let info2 = res2.body[0];
-                     let bmID = info2.beatmapset_id;
-                     imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-                     i = 9;
-                     let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-                     ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-      • Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-      ` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-      • Obtuviste ${rankE}
-      • Mods: *Trabajando en ello*
-      • PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-      • Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-      ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-                     request(`https://osu.ppy.sh/api/get_user?u=${osuUser}&k=${osu.key}&m=${mode}`,
-                     { json: true }, async (e3, res3, body3) => {
-                        if (e3) return;
-                        let userInfo = res3.body[0];
-                        pages.push(desc);
-                        const embed = new RichEmbed()
-                           .setAuthor(`Mejores rendimientos en osu!Mania de ${userInfo.username}`, `https://osu.ppy.sh/images/flags/${userInfo.country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${userInfo.user_id}/mania`)
-                           .setThumbnail(`https://a.ppy.sh/${userInfo.user_id}`)
-                           .setImage(imgs[page-1])
-                           .setColor(msg.member.displayHexColor === '#000000' ? '#FF87B3' : msg.member.displayHexColor)
-                           .setDescription(pages[page-1])
-                           .setFooter(`Página ${page} de ${pages.length}`)
-                           .setTimestamp();
-                        pagesGeneral(msg, embed, page, pages, imgs);
-                     });
-               });
-               });
-               });
-               });
-               });
-               });
-               });
-               });
-               });
-               });
-      });
-      return;
-   }
-   let osuUser = await bd.fetch(`osu.osu.${member.id}.username`);
-   if (osuUser === null || osuUser === undefined) {
-      deleteMsg(msg, 6000);
-      msg.channel.send(`Parece que ${member} no tiene definido ningún nombre de usuario.`)
-         .then(m => deleteMsg(m, 5500));
-      return;
-   }
-   deleteMsg(msg);
-   let limit = 10;
-   let url = `https://osu.ppy.sh/api/get_user_best?u=${osuUser}&` +
-   `k=${osu.key}&limit=${limit}&m=${mode}`;
-   request(url,
-   { json: true }, async (e, res, body) => {
-         if (e) return;
-         let i = 0;
+      osuApi.getUser({ u: osuUser })
+      .then(async user => await bd.set('user', { username: user.name, user_id: user.id, country: user.country }));
+      osuApi.getUserBest({ u: osuUser, m: mode, limit: 20 }).then(async info => {
          let page = 1;
-         let info = res.body;
-         let url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-            if (e2) return;
-            let rankE = info[i].rank === 'XH' ? osuE.XH : 
+         let pages = [];
+         let imgs = [];
+         for (i = 0; i < 20; i++) {
+         let rankE = info[i].rank === 'XH' ? osuE.XH : 
             info[i].rank === 'SH' ? osuE.SH :
             info[i].rank === 'X' ? osuE.X :
             info[i].rank === 'S' ? osuE.S :
@@ -679,292 +31,124 @@ ${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].coun
             info[i].rank === 'B' ? osuE.B :
             info[i].rank === 'C' ? osuE.C :
             info[i].rank === 'F' ? osuE.D : '';
-            let info2 = res2.body[0];
-            let bmID = info2.beatmapset_id;
-            i = 0;
-            let desc1 = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-            ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
+         let info2 = info[i].beatmap;
+         osuApi.getUser({ u: info2.creator })
+         .then(async creator => await bd.set('creator', creator.id));
+         let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapSetId}#osu/${info2.id})**`+
+         ` by [${info2.creator}](https://osu.ppy.sh/users/${bd.get('creator')}) [${info2.version}]`+
+         `\n• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficulty.rating))+
+` \`(${(Math.round(info2.difficulty.rating * 100) / 100).toFixed(2)}*)\``}
 • Obtuviste ${rankE}
 • Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-            
-            let pages = [];
-            let imgs = [];
-            pages.push(desc1);
-            imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-            i = 1;
-         url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-               if (e2) return;
-               let rankE = info[i].rank === 'XH' ? osuE.XH : 
-               info[i].rank === 'SH' ? osuE.SH :
-               info[i].rank === 'X' ? osuE.X :
-               info[i].rank === 'S' ? osuE.S :
-               info[i].rank === 'A' ? osuE.A :
-               info[i].rank === 'B' ? osuE.B :
-               info[i].rank === 'C' ? osuE.C :
-               info[i].rank === 'F' ? osuE.D : '';
-               let info2 = res2.body[0];
-               let bmID = info2.beatmapset_id;
-               i = 1;
-               let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-               ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
+• ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
+• Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`} -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
+${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].counts['300']}\` ║ ${osuE.mhit200}: \`${info[i].counts.katu}\` ║ ${osuE.mhit100}: \`${info[i].counts['100']}\` ║ ${osuE.mhit50}: \`${info[i].counts['50']}\` ║ ${osuE.mhit0}: \`${info[i].counts.miss}\`\n`;
+         pages.push(desc);
+         imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
+         }
+         const embed = new RichEmbed()
+            .setAuthor(`Mejores rendimientos en osu!Mania de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/mania`)
+            .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
+            .setImage(imgs[page-1])
+            .setColor(msg.member.displayHexColor === '#000000' ? '#FF87B3' : msg.member.displayHexColor)
+            .setDescription(pages[page-1])
+            .setFooter(`Página ${page} de ${pages.length}`)
+            .setTimestamp();
+         pagesGeneral(msg, embed, page, pages, imgs);
+      });
+      return;
+   }
+   let member = msg.mentions.members.filter(m => m.id !== pippi.user.id).first();
+   if (!member) {
+      let osuUser = args.slice(1).join(' ');
+      osuApi.getUser({ u: osuUser })
+      .then(async user => await bd.set('user', { username: user.name, user_id: user.id, country: user.country }));
+      osuApi.getUserBest({ u: osuUser, m: mode, limit: 20 }).then(async info => {
+         let page = 1;
+         let pages = [];
+         let imgs = [];
+         for (i = 0; i < 20; i++) {
+         let rankE = info[i].rank === 'XH' ? osuE.XH : 
+            info[i].rank === 'SH' ? osuE.SH :
+            info[i].rank === 'X' ? osuE.X :
+            info[i].rank === 'S' ? osuE.S :
+            info[i].rank === 'A' ? osuE.A :
+            info[i].rank === 'B' ? osuE.B :
+            info[i].rank === 'C' ? osuE.C :
+            info[i].rank === 'F' ? osuE.D : '';
+         let info2 = info[i].beatmap;
+         osuApi.getUser({ u: info2.creator })
+         .then(async creator => await bd.set('creator', creator.id));
+         let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapSetId}#osu/${info2.id})**`+
+         ` by [${info2.creator}](https://osu.ppy.sh/users/${bd.get('creator')}) [${info2.version}]`+
+         `\n• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficulty.rating))+
+` \`(${(Math.round(info2.difficulty.rating * 100) / 100).toFixed(2)}*)\``}
 • Obtuviste ${rankE}
 • Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-               
-               pages.push(desc);
-               imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-               i = 2;
-         url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-               if (e2) return;
-               let rankE = info[i].rank === 'XH' ? osuE.XH : 
-               info[i].rank === 'SH' ? osuE.SH :
-               info[i].rank === 'X' ? osuE.X :
-               info[i].rank === 'S' ? osuE.S :
-               info[i].rank === 'A' ? osuE.A :
-               info[i].rank === 'B' ? osuE.B :
-               info[i].rank === 'C' ? osuE.C :
-               info[i].rank === 'F' ? osuE.D : '';
-               let info2 = res2.body[0];
-               let bmID = info2.beatmapset_id;
-               i = 2;
-               let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-               ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
+• ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
+• Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`} -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
+${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].counts['300']}\` ║ ${osuE.mhit200}: \`${info[i].counts.katu}\` ║ ${osuE.mhit100}: \`${info[i].counts['100']}\` ║ ${osuE.mhit50}: \`${info[i].counts['50']}\` ║ ${osuE.mhit0}: \`${info[i].counts.miss}\`\n`;
+         pages.push(desc);
+         imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
+         }
+         const embed = new RichEmbed()
+            .setAuthor(`Mejores rendimientos en osu!Mania de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/mania`)
+            .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
+            .setImage(imgs[page-1])
+            .setColor('#FF87B3')
+            .setDescription(pages[page-1])
+            .setFooter(`Página ${page} de ${pages.length}`)
+            .setTimestamp();
+         pagesGeneral(msg, embed, page, pages, imgs);
+      }).catch(() => msg.channel.send(`No he podido encontrar a **${osuUser}** en <:EBosu:666406623232655370>`)
+      .then(m => deleteMsg(m, 5000)));
+      return;
+   }
+   let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
+   if (osuUser === null || osuUser === undefined) {
+      deleteMsg(msg, 5000);
+      msg.channel.send(`Parece que ${member} no tiene definido ningún nombre de usuario.`)
+         .then(m => deleteMsg(m, 5500));
+      return;
+   }
+   osuApi.getUser({ u: osuUser })
+   .then(async user => await bd.set('user', { username: user.name, user_id: user.id, country: user.country }));
+   osuApi.getUserBest({ u: osuUser, m: mode, limit: 20 }).then(async info => {
+      let page = 1;
+      let pages = [];
+      let imgs = [];
+      for (i = 0; i < 20; i++) {
+      let rankE = info[i].rank === 'XH' ? osuE.XH : 
+         info[i].rank === 'SH' ? osuE.SH :
+         info[i].rank === 'X' ? osuE.X :
+         info[i].rank === 'S' ? osuE.S :
+         info[i].rank === 'A' ? osuE.A :
+         info[i].rank === 'B' ? osuE.B :
+         info[i].rank === 'C' ? osuE.C :
+         info[i].rank === 'F' ? osuE.D : '';
+      let info2 = info[i].beatmap;
+      osuApi.getUser({ u: info2.creator })
+      .then(async creator => await bd.set('creator', creator.id));
+      let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapSetId}#osu/${info2.id})**`+
+      ` by [${info2.creator}](https://osu.ppy.sh/users/${bd.get('creator')}) [${info2.version}]`+
+      `\n• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficulty.rating))+
+` \`(${(Math.round(info2.difficulty.rating * 100) / 100).toFixed(2)}*)\``}
 • Obtuviste ${rankE}
 • Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-               
-               pages.push(desc);
-               imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-               i = 3;
-         url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-               if (e2) return;
-               let rankE = info[i].rank === 'XH' ? osuE.XH : 
-               info[i].rank === 'SH' ? osuE.SH :
-               info[i].rank === 'X' ? osuE.X :
-               info[i].rank === 'S' ? osuE.S :
-               info[i].rank === 'A' ? osuE.A :
-               info[i].rank === 'B' ? osuE.B :
-               info[i].rank === 'C' ? osuE.C :
-               info[i].rank === 'F' ? osuE.D : '';
-               let info2 = res2.body[0];
-               let bmID = info2.beatmapset_id;
-               i = 3;
-               let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-               ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-               
-               pages.push(desc);
-               imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-               i = 4;
-         url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-               if (e2) return;
-               let rankE = info[i].rank === 'XH' ? osuE.XH : 
-               info[i].rank === 'SH' ? osuE.SH :
-               info[i].rank === 'X' ? osuE.X :
-               info[i].rank === 'S' ? osuE.S :
-               info[i].rank === 'A' ? osuE.A :
-               info[i].rank === 'B' ? osuE.B :
-               info[i].rank === 'C' ? osuE.C :
-               info[i].rank === 'F' ? osuE.D : '';
-               let info2 = res2.body[0];
-               let bmID = info2.beatmapset_id;
-               imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-               i = 4;
-               let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-               ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-               pages.push(desc);
-               i = 5;
-         url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-               if (e2) return;
-               let rankE = info[i].rank === 'XH' ? osuE.XH : 
-               info[i].rank === 'SH' ? osuE.SH :
-               info[i].rank === 'X' ? osuE.X :
-               info[i].rank === 'S' ? osuE.S :
-               info[i].rank === 'A' ? osuE.A :
-               info[i].rank === 'B' ? osuE.B :
-               info[i].rank === 'C' ? osuE.C :
-               info[i].rank === 'F' ? osuE.D : '';
-               let info2 = res2.body[0];
-               let bmID = info2.beatmapset_id;
-               imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-               i = 5;
-               let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-               ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-               pages.push(desc);
-               i = 6;
-         url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-               if (e2) return;
-               let rankE = info[i].rank === 'XH' ? osuE.XH : 
-               info[i].rank === 'SH' ? osuE.SH :
-               info[i].rank === 'X' ? osuE.X :
-               info[i].rank === 'S' ? osuE.S :
-               info[i].rank === 'A' ? osuE.A :
-               info[i].rank === 'B' ? osuE.B :
-               info[i].rank === 'C' ? osuE.C :
-               info[i].rank === 'F' ? osuE.D : '';
-               let info2 = res2.body[0];
-               let bmID = info2.beatmapset_id;
-               imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-               i = 6;
-               let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-               ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-               pages.push(desc);
-               i = 7;
-         url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-               if (e2) return;
-               let rankE = info[i].rank === 'XH' ? osuE.XH : 
-               info[i].rank === 'SH' ? osuE.SH :
-               info[i].rank === 'X' ? osuE.X :
-               info[i].rank === 'S' ? osuE.S :
-               info[i].rank === 'A' ? osuE.A :
-               info[i].rank === 'B' ? osuE.B :
-               info[i].rank === 'C' ? osuE.C :
-               info[i].rank === 'F' ? osuE.D : '';
-               let info2 = res2.body[0];
-               let bmID = info2.beatmapset_id;
-               imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-               i = 7;
-               let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-               ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-               pages.push(desc);
-               i = 8;
-         url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-               if (e2) return;
-               let rankE = info[i].rank === 'XH' ? osuE.XH : 
-               info[i].rank === 'SH' ? osuE.SH :
-               info[i].rank === 'X' ? osuE.X :
-               info[i].rank === 'S' ? osuE.S :
-               info[i].rank === 'A' ? osuE.A :
-               info[i].rank === 'B' ? osuE.B :
-               info[i].rank === 'C' ? osuE.C :
-               info[i].rank === 'F' ? osuE.D : '';
-               let info2 = res2.body[0];
-               let bmID = info2.beatmapset_id;
-               imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-               i = 8;
-               let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-               ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-               pages.push(desc);
-               i = 9;
-         url2 = `https://osu.ppy.sh/api/get_beatmaps?k=${osu.key}&b=${info[i].beatmap_id}&m=${mode}`;
-         await request(url2,
-         { json: true }, async (e2, res2, body2) => {
-               if (e2) return;
-               let rankE = info[i].rank === 'XH' ? osuE.XH : 
-               info[i].rank === 'SH' ? osuE.SH :
-               info[i].rank === 'X' ? osuE.X :
-               info[i].rank === 'S' ? osuE.S :
-               info[i].rank === 'A' ? osuE.A :
-               info[i].rank === 'B' ? osuE.B :
-               info[i].rank === 'C' ? osuE.C :
-               info[i].rank === 'F' ? osuE.D : '';
-               let info2 = res2.body[0];
-               let bmID = info2.beatmapset_id;
-               imgs.push(`https://b.ppy.sh/thumb/${bmID}l.jpg`);
-               i = 9;
-               let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapset_id}#osu/${info2.beatmap_id})**`+
-               ` by [${info2.creator}](https://osu.ppy.sh/users/${info2.creator_id}) [${info2.version}]
-• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficultyrating))+
-` \`(${(Math.round(info2.difficultyrating * 100) / 100).toFixed(2)}*)\``}
-• Obtuviste ${rankE}
-• Mods: *Trabajando en ello*
-• PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)} ║ Acc: *Trabajando en ello*
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxcombo}**x -> ${info[i].perfect == 1 ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].countgeki}\` ║ ${osuE.mhit300}: \`${info[i].count300}\` ║ ${osuE.mhit200}: \`${info[i].countkatu}\` ║ ${osuE.mhit100}: \`${info[i].count100}\` ║ ${osuE.mhit50}: \`${info[i].count50}\` ║ ${osuE.mhit0}: \`${info[i].countmiss}\`\n`;
-               request(`https://osu.ppy.sh/api/get_user?u=${osuUser}&k=${osu.key}&m=${mode}`,
-               { json: true }, async (e3, res3, body3) => {
-                  if (e3) return;
-                  let userInfo = res3.body[0];
-                  pages.push(desc);
-                  const embed = new RichEmbed()
-                     .setAuthor(`Mejores rendimientos en osu!Mania de ${userInfo.username}`, `https://osu.ppy.sh/images/flags/${userInfo.country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${userInfo.user_id}/mania`)
-                     .setThumbnail(`https://a.ppy.sh/${userInfo.user_id}`)
-                     .setImage(imgs[page-1])
-                     .setColor(member.displayHexColor === '#000000' ? '#FF87B3' : member.displayHexColor)
-                     .setDescription(pages[page-1])
-                     .setFooter(`Página ${page} de ${pages.length}`)
-                     .setTimestamp();
-                  pagesGeneral(msg, embed, page, pages, imgs);
-               });
-         });
-         });
-         });
-         });
-         });
-         });
-         });
-         });
-         });
-         });
+• ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
+• Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`} -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
+${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].counts['300']}\` ║ ${osuE.mhit200}: \`${info[i].counts.katu}\` ║ ${osuE.mhit100}: \`${info[i].counts['100']}\` ║ ${osuE.mhit50}: \`${info[i].counts['50']}\` ║ ${osuE.mhit0}: \`${info[i].counts.miss}\`\n`;
+      pages.push(desc);
+      imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
+      }
+      const embed = new RichEmbed()
+         .setAuthor(`Mejores rendimientos en osu!Mania de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/mania`)
+         .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
+         .setImage(imgs[page-1])
+         .setColor(member.displayHexColor === '#000000' ? '#FF87B3' : member.displayHexColor)
+         .setDescription(pages[page-1])
+         .setFooter(`Página ${page} de ${pages.length}`)
+         .setTimestamp();
+      pagesGeneral(msg, embed, page, pages, imgs);
    });
 }

@@ -40,14 +40,14 @@ module.exports = async (pippi, msg, args, mode) => {
 ` \`(${(Math.round(info2.difficulty.rating * 100) / 100).toFixed(2)}*)\``}
 • Obtuviste ${rankE}
 • Mods: *Trabajando en ello*
-• ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
+• ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${info[i].perfect == true ? '100.00' : (Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
 • Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x / **${info2.maxCombo}**x -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
-║ ${osuE.hit300}: \`${info[i].counts['300']}\` ║ ${osuE.hit100}: \`${info[i].counts['100']}\` ║ ${osuE.hit50}: \`${info[i].counts['50']}\` ║ ${osuE.hit0}: \`${info[i].counts.miss}\` ║\n`;
+║ ${osuE.fruit}: \`${info[i].counts['300']}\` ║ ${osuE.fdrop}: \`${info[i].counts['100']}\` ║ ${osuE.fminidrop}: \`${info[i].counts['50']}\` ║ ${osuE.fmiss}: \`${info[i].counts.miss}\` ║\n`;
          pages.push(desc);
          imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
          }
          const embed = new RichEmbed()
-            .setAuthor(`Mejores rendimientos en osu!STD de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/osu`)
+            .setAuthor(`Mejores rendimientos en osu!CatchTheBeat de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/fruits`)
             .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
             .setImage(imgs[page-1])
             .setColor(msg.member.displayHexColor === '#000000' ? '#FF87B3' : msg.member.displayHexColor)
@@ -85,14 +85,14 @@ module.exports = async (pippi, msg, args, mode) => {
 ` \`(${(Math.round(info2.difficulty.rating * 100) / 100).toFixed(2)}*)\``}
 • Obtuviste ${rankE}
 • Mods: *Trabajando en ello*
-• ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
+• ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${info[i].perfect == true ? '100.00' : (Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
 • Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x / **${info2.maxCombo}**x -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
-║ ${osuE.hit300}: \`${info[i].counts['300']}\` ║ ${osuE.hit100}: \`${info[i].counts['100']}\` ║ ${osuE.hit50}: \`${info[i].counts['50']}\` ║ ${osuE.hit0}: \`${info[i].counts.miss}\` ║\n`;
+║ ${osuE.fruit}: \`${info[i].counts['300']}\` ║ ${osuE.fdrop}: \`${info[i].counts['100']}\` ║ ${osuE.fminidrop}: \`${info[i].counts['50']}\` ║ ${osuE.fmiss}: \`${info[i].counts.miss}\` ║\n`;
          pages.push(desc);
          imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
          }
          const embed = new RichEmbed()
-            .setAuthor(`Mejores rendimientos en osu!STD de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/osu`)
+            .setAuthor(`Mejores rendimientos en osu!CatchTheBeat de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/fruits`)
             .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
             .setImage(imgs[page-1])
             .setColor('#FF87B3')
@@ -135,14 +135,14 @@ module.exports = async (pippi, msg, args, mode) => {
 ` \`(${(Math.round(info2.difficulty.rating * 100) / 100).toFixed(2)}*)\``}
 • Obtuviste ${rankE}
 • Mods: *Trabajando en ello*
-• ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
+• ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${info[i].perfect == true ? '100.00' : (Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
 • Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x / **${info2.maxCombo}**x -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
-║ ${osuE.hit300}: \`${info[i].counts['300']}\` ║ ${osuE.hit100}: \`${info[i].counts['100']}\` ║ ${osuE.hit50}: \`${info[i].counts['50']}\` ║ ${osuE.hit0}: \`${info[i].counts.miss}\` ║\n`;
+║ ${osuE.fruit}: \`${info[i].counts['300']}\` ║ ${osuE.fdrop}: \`${info[i].counts['100']}\` ║ ${osuE.fminidrop}: \`${info[i].counts['50']}\` ║ ${osuE.fmiss}: \`${info[i].counts.miss}\` ║\n`;
       pages.push(desc);
       imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
       }
       const embed = new RichEmbed()
-         .setAuthor(`Mejores rendimientos en osu!STD de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/osu`)
+         .setAuthor(`Mejores rendimientos en osu!CatchTheBeat de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/fruits`)
          .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
          .setImage(imgs[page-1])
          .setColor(member.displayHexColor === '#000000' ? '#FF87B3' : member.displayHexColor)

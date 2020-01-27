@@ -88,7 +88,7 @@ module.exports = {
                });
             return;
          }
-         let member = msg.mentions.members.first();
+         let member = msg.mentions.members.filter(m => m.id !== pippi.user.id).first();
          if (!member) {
             let username = args.slice(0).join(' ');
             let url = `https://osu.ppy.sh/api/get_user?u=${username}&k=${osu.key}`;
@@ -207,7 +207,7 @@ module.exports = {
             });
          return;
       }
-      let member = msg.mentions.members.first();
+      let member = msg.mentions.members.filter(m => m.id !== pippi.user.id).first();
       if (!member) {
          let username = args.slice(0).join(' ');
          let url = `http://ripple.moe/api/get_user?u=${username}&m=0`;
