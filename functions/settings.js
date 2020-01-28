@@ -1,5 +1,5 @@
 module.exports = {
-   token: 'NjUyMjExNDAzNjgzMzk3NjQx.XhzbSw.Z5B8A5lag42hYskogufhvYjzH5s',
+   token: 'NjUy...', // Private
    prefix: pippi => {
       return `${pippi.user} `;
    },
@@ -7,6 +7,6 @@ module.exports = {
 		id: '474204150511697923'
    },
    osu: {
-		key: "43d8d31b17acc86cf27634d9d890c981e70685b0"
+		key: "43d8..." // Also private
 	}
 }
