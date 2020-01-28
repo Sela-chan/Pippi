@@ -23,7 +23,6 @@ module.exports = {
                   .then(m => deleteMsg(m, 4500));
                return;
             }
-            deleteMsg(msg);
             let username = args.slice(1).join(' ');
             let url = `https://osu.ppy.sh/api/get_user?u=${username}&k=${osu.key}&m=2`;
             fetch(url, { method: "Get" })
@@ -44,8 +43,12 @@ module.exports = {
                .then(m => deleteMsg(m, 5000)));
             return;
          }
-         if (args[0] === '-top') {
+         if (args[0] === '-top' || args[0] === '-t') {
             require('./top/ctb')(pippi, msg, args, 2);
+            return;
+         }
+         if (args[0] === '-recent' || args[0] === '-r') {
+            require('./recent/ctb')(pippi, msg, args, 2);
             return;
          }
          if (!args[0]) {
@@ -61,7 +64,6 @@ module.exports = {
                .then(r => r.json())
                .then(osuInfo => {
                   let x = osuInfo[0];
-                  deleteMsg(msg);
                   let level = (Math.round(x.level * 100) / 100).toFixed(2);
                   const embed = new RichEmbed()
                   .setAuthor(`Perfil de osu!CatchTheBeat de ${x.username}`, `https://osu.ppy.sh/images/flags/${x.country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${x.user_id}/fruits`)
@@ -88,7 +90,6 @@ module.exports = {
                .then(r => r.json())
                .then(osuInfo => {
                   let x = osuInfo[0];
-                  deleteMsg(msg);
                   let level = (Math.round(x.level * 100) / 100).toFixed(2);
                   const embed = new RichEmbed()
                      .setAuthor(`Perfil de osu!CatchTheBeat de ${x.username}`, `https://osu.ppy.sh/images/flags/${x.country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${x.user_id}/fruits`)
@@ -120,7 +121,6 @@ module.exports = {
             .then(r => r.json())
             .then(osuInfo => {
                let x = osuInfo[0];
-               deleteMsg(msg);
                let level = (Math.round(x.level * 100) / 100).toFixed(2);
                const embed = new RichEmbed()
                .setAuthor(`Perfil de osu!CatchTheBeat de ${x.username}`, `https://osu.ppy.sh/images/flags/${x.country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${x.user_id}/fruits`)
@@ -147,7 +147,6 @@ module.exports = {
                .then(m => deleteMsg(m, 4500));
             return;
          }
-         deleteMsg(msg);
          let username = args.slice(1).join(' ');
          let url = `http://ripple.moe/api/get_user?u=${username}&m=2`;
          fetch(url, { method: "Get" })
@@ -181,7 +180,6 @@ module.exports = {
             .then(r => r.json())
             .then(osuInfo => {
                let x = osuInfo[0];
-               deleteMsg(msg);
                let level = (Math.round(x.level * 100) / 100).toFixed(2);
                const embed = new RichEmbed()
                .setAuthor(`Perfil de Ripple CatchTheBeat de ${x.username}`, `https://osu.ppy.sh/images/flags/${x.country.toUpperCase()}.png`, `https://ripple.moe/u/${x.user_id}?mode=2`)
@@ -207,7 +205,6 @@ module.exports = {
             .then(r => r.json())
             .then(osuInfo => {
                let x = osuInfo[0];
-               deleteMsg(msg);
                let level = (Math.round(x.level * 100) / 100).toFixed(2);
                const embed = new RichEmbed()
                   .setAuthor(`Perfil de Ripple CatchTheBeat de ${x.username}`, `https://osu.ppy.sh/images/flags/${x.country.toUpperCase()}.png`, `https://ripple.moe/u/${x.user_id}?mode=2`)
@@ -238,7 +235,6 @@ module.exports = {
          .then(r => r.json())
          .then(osuInfo => {
             let x = osuInfo[0];
-            deleteMsg(msg);
             let level = (Math.round(x.level * 100) / 100).toFixed(2);
             const embed = new RichEmbed()
             .setAuthor(`Perfil de Ripple CatchTheBeat de ${x.username}`, `https://osu.ppy.sh/images/flags/${x.country.toUpperCase()}.png`, `https://ripple.moe/u/${x.user_id}?mode=2`)
