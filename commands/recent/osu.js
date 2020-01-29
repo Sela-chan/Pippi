@@ -22,7 +22,9 @@ module.exports = async (pippi, msg, args, mode) => {
          let page = 1;
          let pages = [];
          let imgs = [];
-         for (i = 0; i < 10; i++) {
+         if (info.length<10) var limit = info.length;
+         else var limit = 10;
+         for (i = 0; i < limit; i++) {
          let rankE = info[i].rank === 'XH' ? osuE.XH : 
             info[i].rank === 'SH' ? osuE.SH :
             info[i].rank === 'X' ? osuE.X :
@@ -68,7 +70,9 @@ module.exports = async (pippi, msg, args, mode) => {
          let page = 1;
          let pages = [];
          let imgs = [];
-         for (i = 0; i < 10; i++) {
+         if (info.length<10) var limit = info.length;
+         else var limit = 10;
+         for (i = 0; i < limit; i++) {
          let rankE = info[i].rank === 'XH' ? osuE.XH : 
             info[i].rank === 'SH' ? osuE.SH :
             info[i].rank === 'X' ? osuE.X :
@@ -118,7 +122,9 @@ module.exports = async (pippi, msg, args, mode) => {
       let page = 1;
       let pages = [];
       let imgs = [];
-      for (i = 0; i < 10; i++) {
+      if (info.length<10) var limit = info.length;
+         else var limit = 10;
+      for (i = 0; i < limit; i++) {
       let rankE = info[i].rank === 'XH' ? osuE.XH : 
          info[i].rank === 'SH' ? osuE.SH :
          info[i].rank === 'X' ? osuE.X :

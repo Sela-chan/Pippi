@@ -14,13 +14,11 @@ module.exports = {
    perms: [],
    description: `Información osu!Standard`,
    run: async (pippi, msg, args) => {
-      bd.delete(`tempBMInfo`);
-      bd.delete(`tempOsuInfo`);
-      bd.delete(`tempImageBG`);
-      bd.delete(`temp.osu`);
       msg.content = msg.content.replace(/<@!652211403683397641>/g, '');
       if (args[args.length-1] !== '-ripple') {
          if (args[0] === '-set') {
+            return msg.channel.send('La opción **-set** ha sido deshabilitada, debes especificar el usuario de osu!')
+            .then(m => deleteMsg(m, 5000));
             if (!args[1]) {
                deleteMsg(msg, 5000);
                msg.channel.send('Debes escribir el nombre de usuario que deseas predeterminar.')
@@ -56,6 +54,8 @@ module.exports = {
             return;
          }
          if (!args[0]) {
+            return msg.channel.send('Debes especificar un nombre de usuario de osu!')
+            .then(m => deleteMsg(m, 5000));
             let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
             if (osuUser === null || osuUser === undefined) {
                deleteMsg(msg, 6000);
@@ -113,6 +113,8 @@ module.exports = {
                                  .then(m => deleteMsg(m, 5000)));
             return;
          }
+         return msg.channel.send('Debes especificar un nombre de usuario de osu!')
+         .then(m => deleteMsg(m, 5000));
          let osuUser = await bd.fetch(`osu.osu.${member.id}.username`);
          if (osuUser === null || osuUser === undefined) {
             deleteMsg(msg, 5000);
@@ -145,6 +147,8 @@ module.exports = {
       }
       args.splice(args.length-1, 1);
       if (args[0] === '-set') {
+         return msg.channel.send('La opción **-set** ha sido deshabilitada, debes especificar el usuario de Ripple.')
+         .then(m => deleteMsg(m, 5000));
          if (!args[1]) {
             deleteMsg(msg, 5000);
             msg.channel.send('Debes escribir el nombre de usuario que deseas predeterminar.')
@@ -172,6 +176,8 @@ module.exports = {
          return;
       }
       if (!args[0]) {
+         return msg.channel.send('Debes especificar un nombre de usuario de Ripple.')
+         .then(m => deleteMsg(m, 5000));
          let osuUser = await bd.fetch(`ripple.ripple.${msg.author.id}.username`);
          if (osuUser === null || osuUser === undefined) {
             deleteMsg(msg, 6000);
@@ -227,6 +233,8 @@ module.exports = {
                               .then(m => deleteMsg(m, 5000)));
          return;
       }
+      return msg.channel.send('Debes especificar un nombre de usuario de Ripple.')
+      .then(m => deleteMsg(m, 5000));
       let osuUser = await bd.fetch(`ripple.ripple.${member.id}.username`);
       if (osuUser === null || osuUser === undefined) {
          deleteMsg(msg, 5000);

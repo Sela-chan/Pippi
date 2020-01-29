@@ -21,6 +21,9 @@ module.exports = {
       fruit: "<:EBfruit:671463132090204161>",
       fdrop: "<:EBfruitdrop:671463132161376269>",
       fminidrop: "<:EBfruitdropmini:671463132207775794>",
-      fmiss: "<:EBhit0:664652918095478785>"
+      fmiss: "<:EBhit0:664652918095478785>",
+      thit300: "<:EBtaikohit300:672085635904962580>",
+      thit100: "<:EBtaikohit100:672085636735303710>",
+      thit0: "<:EBtaikohit0:672085636173529088>"
    }
 }

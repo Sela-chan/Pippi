@@ -7,16 +7,16 @@ const { osuE } = require('../../functions/emojis');
 const { osu } = require('../../functions/settings');
 const osuApi = new nosu.Api(osu.key, { completeScores: true, notFoundAsError: true });
 
-module.exports = async (pippi, msg, wMania, args, mode) => {
+module.exports = async (pippi, msg, wTaiko, args, mode) => {
    if (args[args.length-1] !== '-first') {
-      wMania = msg.channel;
+      wTaiko = msg.channel;
    if (!args[1]) {
-      return wTaiko.send('Debes especificar un nombre de usuario de osu!')
+      return wTaiko.send('Debes especificar un nombre de usuario de <:EBosu:666406623232655370>.')
       .then(m => deleteMsg(m, 5000));
       let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
       if (osuUser === null || osuUser === undefined) {
          deleteMsg(msg, 5000);
-         msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${pippi.user} osu -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
+         wTaiko.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${pippi.user} osu -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
             .then(m => deleteMsg(m, 5500));
          return;
       }
@@ -47,13 +47,13 @@ module.exports = async (pippi, msg, wMania, args, mode) => {
 • Obtuviste ${rankE}
 • Mods: *Trabajando en ello*
 • ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`} -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].counts['300']}\` ║ ${osuE.mhit200}: \`${info[i].counts.katu}\` ║ ${osuE.mhit100}: \`${info[i].counts['100']}\` ║ ${osuE.mhit50}: \`${info[i].counts['50']}\` ║ ${osuE.mhit0}: \`${info[i].counts.miss}\`\n`;
+• Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`}
+║ ${osuE.thit300}: \`${info[i].counts['300']}\` ║ ${osuE.thit100}: \`${info[i].counts['100']}\` ║ ${osuE.thit0}: \`${info[i].counts.miss}\` ║\n`;
          pages.push(desc);
          imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
          }
          const embed = new RichEmbed()
-            .setAuthor(`Jugadas recientes en osu!Mania de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/osu`)
+            .setAuthor(`Jugadas recientes en osu!Taiko de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/taiko`)
             .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
             .setImage(imgs[page-1])
             .setColor(msg.member.displayHexColor === '#000000' ? '#FF87B3' : msg.member.displayHexColor)
@@ -61,7 +61,7 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
             .setFooter(`Página ${page} de ${pages.length}`)
             .setTimestamp();
          pagesGeneral(msg, embed, page, pages, imgs);
-      }).catch(() => msg.channel.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
+      }).catch(() => wTaiko.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
       .then(m => deleteMsg(m, 5000)));
       return;
    }
@@ -95,13 +95,13 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
 • Obtuviste ${rankE}
 • Mods: *Trabajando en ello*
 • ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`} -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].counts['300']}\` ║ ${osuE.mhit200}: \`${info[i].counts.katu}\` ║ ${osuE.mhit100}: \`${info[i].counts['100']}\` ║ ${osuE.mhit50}: \`${info[i].counts['50']}\` ║ ${osuE.mhit0}: \`${info[i].counts.miss}\`\n`;
+• Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`}
+║ ${osuE.thit300}: \`${info[i].counts['300']}\` ║ ${osuE.thit100}: \`${info[i].counts['100']}\` ║ ${osuE.thit0}: \`${info[i].counts.miss}\` ║\n`;
          pages.push(desc);
          imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
          }
          const embed = new RichEmbed()
-            .setAuthor(`Jugadas recientes en osu!Mania de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/osu`)
+            .setAuthor(`Jugadas recientes en osu!Taiko de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/taiko`)
             .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
             .setImage(imgs[page-1])
             .setColor('#FF87B3')
@@ -109,16 +109,16 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
             .setFooter(`Página ${page} de ${pages.length}`)
             .setTimestamp();
          pagesGeneral(msg, embed, page, pages, imgs);
-      }).catch(() => msg.channel.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
+      }).catch(() => wTaiko.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
       .then(m => deleteMsg(m, 5000)));
       return;
    }
-   return wTaiko.send('Debes especificar un nombre de usuario de osu!')
+   return wTaiko.send('Debes especificar un nombre de usuario de <:EBosu:666406623232655370>.')
    .then(m => deleteMsg(m, 5000));
-   let osuUser = await bd.fetch(`osu.osu.${member.id}.username`);
+   let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
    if (osuUser === null || osuUser === undefined) {
       deleteMsg(msg, 5000);
-      msg.channel.send(`Parece que ${member} no tiene definido ningún nombre de usuario.`)
+      wTaiko.send(`Parece que ${member} no tiene definido ningún nombre de usuario.`)
          .then(m => deleteMsg(m, 5500));
       return;
    }
@@ -149,13 +149,13 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
 • Obtuviste ${rankE}
 • Mods: *Trabajando en ello*
 • ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
-• Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`} -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
-${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].counts['300']}\` ║ ${osuE.mhit200}: \`${info[i].counts.katu}\` ║ ${osuE.mhit100}: \`${info[i].counts['100']}\` ║ ${osuE.mhit50}: \`${info[i].counts['50']}\` ║ ${osuE.mhit0}: \`${info[i].counts.miss}\`\n`;
+• Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`}
+║ ${osuE.thit300}: \`${info[i].counts['300']}\` ║ ${osuE.thit100}: \`${info[i].counts['100']}\` ║ ${osuE.thit0}: \`${info[i].counts.miss}\` ║\n`;
       pages.push(desc);
       imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
       }
       const embed = new RichEmbed()
-         .setAuthor(`Jugadas recientes en osu!Mania de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/osu`)
+         .setAuthor(`Jugadas recientes en osu!Taiko de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/taiko`)
          .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
          .setImage(imgs[page-1])
          .setColor(member.displayHexColor === '#000000' ? '#FF87B3' : member.displayHexColor)
@@ -163,18 +163,19 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
          .setFooter(`Página ${page} de ${pages.length}`)
          .setTimestamp();
       pagesGeneral(msg, embed, page, pages, imgs);
-   }).catch(() => msg.channel.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
+   }).catch(() => wTaiko.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
    .then(m => deleteMsg(m, 5000)));
    return;
    } else {
       args.splice(args.length-1, 1);
+      var i = 0;
       if (!args[1]) {
          return wTaiko.send('Debes especificar un nombre de usuario de osu!')
          .then(m => deleteMsg(m, 5000));
          let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
          if (osuUser === null || osuUser === undefined) {
             deleteMsg(msg, 5000);
-            msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${pippi.user} osu -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
+            wTaiko.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${pippi.user} osu -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
                .then(m => deleteMsg(m, 5500));
             return;
          }
@@ -205,13 +206,13 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
    • Obtuviste ${rankE}
    • Mods: *Trabajando en ello*
    • ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
-   • Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`} -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
-   ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].counts['300']}\` ║ ${osuE.mhit200}: \`${info[i].counts.katu}\` ║ ${osuE.mhit100}: \`${info[i].counts['100']}\` ║ ${osuE.mhit50}: \`${info[i].counts['50']}\` ║ ${osuE.mhit0}: \`${info[i].counts.miss}\`\n`;
+   • Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`}
+   ║ ${osuE.thit300}: \`${info[i].counts['300']}\` ║ ${osuE.thit100}: \`${info[i].counts['100']}\` ║ ${osuE.thit0}: \`${info[i].counts.miss}\` ║\n`;
             pages.push(desc);
             imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
             }
             const embed = new RichEmbed()
-               .setAuthor(`Jugadas recientes en osu!Mania de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/osu`)
+               .setAuthor(`Jugadas recientes en osu!Taiko de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/taiko`)
                .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
                .setImage(imgs[page-1])
                .setColor(msg.member.displayHexColor === '#000000' ? '#FF87B3' : msg.member.displayHexColor)
@@ -219,7 +220,7 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
                .setFooter(`Página ${page} de ${pages.length}`)
                .setTimestamp();
             pagesGeneral(msg, embed, page, pages, imgs);
-         }).catch(() => msg.channel.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
+         }).catch(() => wTaiko.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
          .then(m => deleteMsg(m, 5000)));
          return;
       }
@@ -232,9 +233,6 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
             let page = 1;
             let pages = [];
             let imgs = [];
-            if (info.length<10) var limit = info.length;
-            else var limit = 10;
-            for (i = 0; i < limit; i++) {
             let rankE = info[i].rank === 'XH' ? osuE.XH : 
                info[i].rank === 'SH' ? osuE.SH :
                info[i].rank === 'X' ? osuE.X :
@@ -253,30 +251,29 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
    • Obtuviste ${rankE}
    • Mods: *Trabajando en ello*
    • ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
-   • Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`} -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
-   ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].counts['300']}\` ║ ${osuE.mhit200}: \`${info[i].counts.katu}\` ║ ${osuE.mhit100}: \`${info[i].counts['100']}\` ║ ${osuE.mhit50}: \`${info[i].counts['50']}\` ║ ${osuE.mhit0}: \`${info[i].counts.miss}\`\n`;
+   • Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`}
+   ║ ${osuE.thit300}: \`${info[i].counts['300']}\` ║ ${osuE.thit100}: \`${info[i].counts['100']}\` ║ ${osuE.thit0}: \`${info[i].counts.miss}\` ║\n`;
             pages.push(desc);
             imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
-            }
             const embed = new RichEmbed()
-               .setAuthor(`Jugadas recientes en osu!Mania de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/osu`)
+               .setAuthor(`Jugadas recientes en osu!Taiko de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/taiko`)
                .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
                .setImage(imgs[page-1])
                .setColor('#FF87B3')
                .setDescription(pages[page-1])
                .setFooter(`Página ${page} de ${pages.length}`)
                .setTimestamp();
-            pagesGeneral(msg, embed, page, pages, imgs);
-         }).catch(() => msg.channel.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
+            wTaiko.send(embed);
+         }).catch(() => wTaiko.send(`Parece que **${osuUser}** no tiene partidas recientes en osu!`)
          .then(m => deleteMsg(m, 5000)));
          return;
       }
       return wTaiko.send('Debes especificar un nombre de usuario de osu!')
       .then(m => deleteMsg(m, 5000));
-      let osuUser = await bd.fetch(`osu.osu.${member.id}.username`);
+      let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
       if (osuUser === null || osuUser === undefined) {
          deleteMsg(msg, 5000);
-         msg.channel.send(`Parece que ${member} no tiene definido ningún nombre de usuario.`)
+         wTaiko.send(`Parece que ${member} no tiene definido ningún nombre de usuario.`)
             .then(m => deleteMsg(m, 5500));
          return;
       }
@@ -307,13 +304,13 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
    • Obtuviste ${rankE}
    • Mods: *Trabajando en ello*
    • ${info[i].pp === null ? 'No PP :c' : `PP: ${(Math.round(info[i].pp * 100) / 100).toFixed(2)}`} ║ Acc: ${(Math.round(info[i].accuracy * 10000) / 100).toFixed(2)}%
-   • Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`} -> ${info[i].perfect == true ? '**FC!**' : 'No FC T-T'}
-   ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].counts['300']}\` ║ ${osuE.mhit200}: \`${info[i].counts.katu}\` ║ ${osuE.mhit100}: \`${info[i].counts['100']}\` ║ ${osuE.mhit50}: \`${info[i].counts['50']}\` ║ ${osuE.mhit0}: \`${info[i].counts.miss}\`\n`;
+   • Puntuación: ${info[i].score} | Combo: **${info[i].maxCombo}**x${info2.maxCombo === null ? '' : ` / **${info2.maxCombo}**x`}
+   ║ ${osuE.thit300}: \`${info[i].counts['300']}\` ║ ${osuE.thit100}: \`${info[i].counts['100']}\` ║ ${osuE.thit0}: \`${info[i].counts.miss}\` ║\n`;
          pages.push(desc);
          imgs.push(`https://b.ppy.sh/thumb/${info2.beatmapSetId}l.jpg`);
          }
          const embed = new RichEmbed()
-            .setAuthor(`Jugadas recientes en osu!Mania de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/osu`)
+            .setAuthor(`Jugadas recientes en osu!Taiko de ${bd.get('user').username}`, `https://osu.ppy.sh/images/flags/${bd.get('user').country.toUpperCase()}.png`, `https://osu.ppy.sh/users/${bd.get('user').user_id}/taiko`)
             .setThumbnail(`https://a.ppy.sh/${bd.get('user').user_id}`)
             .setImage(imgs[page-1])
             .setColor(member.displayHexColor === '#000000' ? '#FF87B3' : member.displayHexColor)
@@ -321,7 +318,7 @@ ${osuE.mhit300g}: \`${info[i].counts.geki}\` ║ ${osuE.mhit300}: \`${info[i].co
             .setFooter(`Página ${page} de ${pages.length}`)
             .setTimestamp();
          pagesGeneral(msg, embed, page, pages, imgs);
-      }).catch(() => msg.channel.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
+      }).catch(() => wTaiko.send(`Parece que **${osuUser}** no tiene partidas recientes en <:EBosu:666406623232655370>`)
       .then(m => deleteMsg(m, 5000)));
    }
 }

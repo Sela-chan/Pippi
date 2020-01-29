@@ -1,7 +1,8 @@
-const { RichEmbed, Client } = require('discord.js');
+const { RichEmbed, Client, WebhookClient } = require('discord.js');
 const bd = require('quick.db');
 const fetch = require('node-fetch');
 const deleteMsg = require('../functions/deleteMsg');
+const imgur = require('../functions/imgur');
 const { osu } = require('../functions/settings');
 const { put } = require('../functions/misc');
 const pippi = new Client();
@@ -14,12 +15,20 @@ module.exports = {
    perms: [],
    description: `Información osu!Taiko`,
    run: async (pippi, msg, args, ops) => {
+      msg.channel.fetchWebhooks()
+      .then(async wh => {
+         if (!wh.find(w => w.name === 'Taiko!')) {
+            msg.channel.createWebhook('Taiko!', imgur('SgfVDlR', 'png'));
+         }
+         var wTaiko = wh.find(w => w.name === 'Taiko!');
       msg.content = msg.content.replace(/<@!652211403683397641>/g, '');
       if (args[args.length-1] !== '-ripple') {
          if (args[0] === '-set') {
+            return wTaiko.send('La opción **-set** ha sido deshabilitada, debes especificar el usuario de <:EBosu:657311734654304286>.')
+            .then(m => deleteMsg(m, 5000));
             if (!args[1]) {
                deleteMsg(msg, 5000);
-               msg.channel.send('Debes escribir el nombre de usuario que deseas predeterminar.')
+               wTaiko.send('Debes escribir el nombre de usuario que deseas predeterminar.')
                   .then(m => deleteMsg(m, 4500));
                return;
             }
@@ -31,23 +40,33 @@ module.exports = {
                let x = osuInfo[0];
                bd.set(`osu.osu.${msg.author.id}.username`, x.username);
                bd.set(`osu.osu.${msg.author.id}.id`, x.user_id);
-               msg.channel.send(new RichEmbed()
+               wTaiko.send(new RichEmbed()
                   .setAuthor(pippi.user.username, pippi.user.displayAvatarURL)
                   .setTitle('¡Listo!')
                   .setThumbnail(msg.author.displayAvatarURL)
                   .setColor(put.green)
-                  .addField('Nuevo nombre de usuario definido para <:osu:657311734654304286>', x.username)
+                  .addField('Nuevo nombre de usuario definido para <:EBosu:657311734654304286>', x.username)
                   .setTimestamp())
                   .then(m => deleteMsg(m, 5000));
-            }).catch(() => msg.channel.send(`Parece que el nombre de usuario **${username}** no existe en <:osu:657311734654304286>\n*Asegúrate de haberlo escrito bien.*`)
+            }).catch(() => wTaiko.send(`Parece que el nombre de usuario **${username}** no existe en <:EBosu:657311734654304286>\n*Asegúrate de haberlo escrito bien.*`)
                .then(m => deleteMsg(m, 5000)));
             return;
          }
+         if (args[0] === '-top' || args[0] === '-t') {
+            require('./top/taiko')(pippi, msg, wTaiko, args, 1);
+            return;
+         }
+         if (args[0] === '-recent' || args[0] === '-r') {
+            require('./recent/taiko')(pippi, msg, wTaiko, args, 1);
+            return;
+         }
          if (!args[0]) {
+            return wTaiko.send('Debes especificar un nombre de usuario de osu!')
+            .then(m => deleteMsg(m, 5000));
             let taikoUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
             if (taikoUser === null || taikoUser === undefined) {
                deleteMsg(msg, 6000);
-               msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}taiko -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
+               wTaiko.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}taiko -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
                   .then(m => deleteMsg(m, 5500));
                return;
             }
@@ -70,7 +89,7 @@ module.exports = {
                   .addField('Conteo de jugadas', x.playcount, true)
                   .addField('Horas jugadas', `**${Math.floor(parseInt(x.total_seconds_played) / 3600)}**`, true)
                   .setFooter(`Se unió el ${x.join_date}`);
-               msg.channel.send(embed);
+               wTaiko.send(embed);
                });
             return;
          }
@@ -96,15 +115,17 @@ module.exports = {
                      .addField('Conteo de jugadas', x.playcount, true)
                      .addField('Horas jugadas', `**${Math.floor(parseInt(x.total_seconds_played) / 3600)}**`, true)
                      .setFooter(`Se unió el ${x.join_date}`);
-                  msg.channel.send(embed);
-               }).catch(() => msg.channel.send(`No he podido encontrar a **${username}** en <:osu:657311734654304286>`)
+                  wTaiko.send(embed);
+               }).catch(() => wTaiko.send(`No he podido encontrar a **${username}** en <:EBosu:657311734654304286>`)
                                  .then(m => deleteMsg(m, 5000)));
             return;
          }
+         return wTaiko.send('Debes especificar un nombre de usuario de osu!')
+         .then(m => deleteMsg(m, 5000));
          let taikoUser = await bd.fetch(`osu.osu.${member.id}.username`);
          if (taikoUser === null || taikoUser === undefined) {
             deleteMsg(msg, 5000);
-            msg.channel.send(`Parece que ${member} no tiene definido un usuario.`)
+            wTaiko.send(`Parece que ${member} no tiene definido un usuario.`)
                .then(m => deleteMsg(m, 4500));
             return;
          }
@@ -127,15 +148,17 @@ module.exports = {
                .addField('Conteo de jugadas', x.playcount, true)
                .addField('Horas jugadas', `**${Math.floor(parseInt(x.total_seconds_played) / 3600)}**`, true)
                .setFooter(`Se unió el ${x.join_date}`);
-            msg.channel.send(embed);
+            wTaiko.send(embed);
             });
          return;
       }
       args.splice(args.length-1, 1);
       if (args[0] === '-set') {
+         return wTaiko.send('La opción **-set** ha sido deshabilitada, debes especificar el usuario de Ripple.')
+         .then(m => deleteMsg(m, 5000));
          if (!args[1]) {
             deleteMsg(msg, 5000);
-            msg.channel.send('Debes escribir el nombre de usuario que deseas predeterminar.')
+            wTaiko.send('Debes escribir el nombre de usuario que deseas predeterminar.')
                .then(m => deleteMsg(m, 4500));
             return;
          }
@@ -147,7 +170,7 @@ module.exports = {
             let x = rippleInfo[0];
             bd.set(`ripple.ripple.${msg.author.id}.username`, x.username);
             bd.set(`ripple.ripple.${msg.author.id}.id`, x.user_id);
-            msg.channel.send(new RichEmbed()
+            wTaiko.send(new RichEmbed()
                .setAuthor(pippi.user.username, pippi.user.displayAvatarURL)
                .setTitle('¡Listo!')
                .setThumbnail(msg.author.displayAvatarURL)
@@ -155,15 +178,17 @@ module.exports = {
                .addField('Nuevo nombre de usuario definido para Ripple', x.username)
                .setTimestamp())
                .then(m => deleteMsg(m, 5000));
-         }).catch(() => msg.channel.send(`Parece que el nombre de usuario **${username}** no existe en Ripple\n*Asegúrate de haberlo escrito bien.*`)
+         }).catch(() => wTaiko.send(`Parece que el nombre de usuario **${username}** no existe en Ripple\n*Asegúrate de haberlo escrito bien.*`)
             .then(m => deleteMsg(m, 5000)));
          return;
       }
       if (!args[0]) {
+         return wTaiko.send('Debes especificar un nombre de usuario de Ripple.')
+         .then(m => deleteMsg(m, 5000));
          let osuUser = await bd.fetch(`ripple.ripple.${msg.author.id}.username`);
          if (osuUser === null || osuUser === undefined) {
             deleteMsg(msg, 6000);
-            msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}taiko -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
+            wTaiko.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}taiko -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
                .then(m => deleteMsg(m, 5500));
             return;
          }
@@ -185,7 +210,7 @@ module.exports = {
                .addField('Accuracy', (Math.round(x.accuracy * 100) / 100).toFixed(2)+'%', true)
                .addField('Conteo de jugadas', x.playcount, true)
                .setTimestamp();
-            msg.channel.send(embed);
+            wTaiko.send(embed);
             });
          return;
       }
@@ -210,15 +235,17 @@ module.exports = {
                   .addField('Accuracy', (Math.round(x.accuracy * 100) / 100).toFixed(2)+'%', true)
                   .addField('Conteo de jugadas', x.playcount, true)
                   .setTimestamp();
-               msg.channel.send(embed);
-            }).catch(() => msg.channel.send(`No he podido encontrar a **${username}** en Ripple`)
+               wTaiko.send(embed);
+            }).catch(() => wTaiko.send(`No he podido encontrar a **${username}** en Ripple`)
                               .then(m => deleteMsg(m, 5000)));
          return;
       }
+      return wTaiko.send('Debes especificar un nombre de usuario de osu!')
+      .then(m => deleteMsg(m, 5000));
       let taikoUser = await bd.fetch(`ripple.ripple.${member.id}.username`);
       if (taikoUser === null || taikoUser === undefined) {
          deleteMsg(msg, 5000);
-         msg.channel.send(`Parece que ${member} no tiene definido un usuario.`)
+         wTaiko.send(`Parece que ${member} no tiene definido un usuario.`)
             .then(m => deleteMsg(m, 4500));
          return;
       }
@@ -240,7 +267,8 @@ module.exports = {
             .addField('Accuracy', (Math.round(x.accuracy * 100) / 100).toFixed(2)+'%', true)
             .addField('Conteo de jugadas', x.playcount, true)
             .setTimestamp();
-         msg.channel.send(embed);
+         wTaiko.send(embed);
          });
+      });
    }
 }

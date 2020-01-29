@@ -2,6 +2,7 @@ const { RichEmbed, Client } = require('discord.js');
 const bd = require('quick.db');
 const fetch = require('node-fetch');
 const deleteMsg = require('../functions/deleteMsg');
+const imgur = require('../functions/imgur');
 const { osu } = require('../functions/settings');
 const { put } = require('../functions/misc');
 const pippi = new Client();
@@ -15,11 +16,19 @@ module.exports = {
    description: `Información osu!CatchTheBeat`,
    run: async (pippi, msg, args, ops) => {
       msg.content = msg.content.replace(/<@!652211403683397641>/g, '');
+      msg.channel.fetchWebhooks()
+      .then(async wh => {
+         if (!wh.find(w => w.name === 'Catch The Beat!')) {
+            msg.channel.createWebhook('Catch The Beat!', imgur('WBo7FTF', 'png'));
+         }
+         var wCTB = wh.find(w => w.name === 'Catch The Beat!');
       if (args[args.length-1] !== '-ripple') {
          if (args[0] === '-set') {
+            return wCTB.send('La opción **-set** ha sido deshabilitada, debes especificar el usuario de osu!')
+            .then(m => deleteMsg(m, 5000));
             if (!args[1]) {
                deleteMsg(msg, 5000);
-               msg.channel.send('Debes escribir el nombre de usuario que deseas predeterminar.')
+               wCTB.send('Debes escribir el nombre de usuario que deseas predeterminar.')
                   .then(m => deleteMsg(m, 4500));
                return;
             }
@@ -31,7 +40,7 @@ module.exports = {
                let x = osuInfo[0];
                bd.set(`osu.osu.${msg.author.id}.username`, x.username);
                bd.set(`osu.osu.${msg.author.id}.id`, x.user_id);
-               msg.channel.send(new RichEmbed()
+               wCTB.send(new RichEmbed()
                   .setAuthor(pippi.user.username, pippi.user.displayAvatarURL)
                   .setTitle('¡Listo!')
                   .setThumbnail(msg.author.displayAvatarURL)
@@ -39,23 +48,25 @@ module.exports = {
                   .addField('Nuevo nombre de usuario definido para <:EBosu:657311734654304286>', x.username)
                   .setTimestamp())
                   .then(m => deleteMsg(m, 5000));
-            }).catch(() => msg.channel.send(`Parece que el nombre de usuario **${username}** no existe en <:EBosu:657311734654304286>\n*Asegúrate de haberlo escrito bien.*`)
+            }).catch(() => wCTB.send(`Parece que el nombre de usuario **${username}** no existe en <:EBosu:657311734654304286>\n*Asegúrate de haberlo escrito bien.*`)
                .then(m => deleteMsg(m, 5000)));
             return;
          }
          if (args[0] === '-top' || args[0] === '-t') {
-            require('./top/ctb')(pippi, msg, args, 2);
+            require('./top/ctb')(pippi, msg, wCTB, args, 2);
             return;
          }
          if (args[0] === '-recent' || args[0] === '-r') {
-            require('./recent/ctb')(pippi, msg, args, 2);
+            require('./recent/ctb')(pippi, msg, wCTB, args, 2);
             return;
          }
          if (!args[0]) {
+            return wCTB.send('Debes especificar un nombre de usuario de osu!')
+            .then(m => deleteMsg(m, 5000));
             let ctbUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
             if (ctbUser === null || ctbUser === undefined) {
                deleteMsg(msg, 6000);
-               msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}ctb -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
+               wCTB.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}ctb -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
                   .then(m => deleteMsg(m, 5500));
                return;
             }
@@ -78,7 +89,7 @@ module.exports = {
                   .addField('Conteo de jugadas', x.playcount, true)
                   .addField('Horas jugadas', `**${Math.floor(parseInt(x.total_seconds_played) / 3600)}**`, true)
                   .setFooter(`Se unió el ${x.join_date}`);
-               msg.channel.send(embed);
+               wCTB.send(embed);
                });
             return;
          }
@@ -104,15 +115,17 @@ module.exports = {
                      .addField('Conteo de jugadas', x.playcount, true)
                      .addField('Horas jugadas', `**${Math.floor(parseInt(x.total_seconds_played) / 3600)}**`, true)
                      .setFooter(`Se unió el ${x.join_date}`);
-                  msg.channel.send(embed);
-               }).catch(() => msg.channel.send(`No he podido encontrar a **${username}** en <:EBosu:657311734654304286>`)
+                  wCTB.send(embed);
+               }).catch(() => wCTB.send(`No he podido encontrar a **${username}** en <:EBosu:657311734654304286>`)
                                  .then(m => deleteMsg(m, 5000)));
             return;
          }
+         return wCTB.send('Debes especificar un nombre de usuario de osu!')
+         .then(m => deleteMsg(m, 5000));
          let ctbUser = await bd.fetch(`osu.osu.${member.id}.username`);
          if (ctbUser === null || ctbUser === undefined) {
             deleteMsg(msg, 5000);
-            msg.channel.send(`Parece que ${member} no tiene definido un usuario.`)
+            wCTB.send(`Parece que ${member} no tiene definido un usuario.`)
                .then(m => deleteMsg(m, 4500));
             return;
          }
@@ -135,15 +148,17 @@ module.exports = {
                .addField('Conteo de jugadas', x.playcount, true)
                .addField('Horas jugadas', `**${Math.floor(parseInt(x.total_seconds_played) / 3600)}**`, true)
                .setFooter(`Se unió el ${x.join_date}`);
-            msg.channel.send(embed);
+            wCTB.send(embed);
             });
          return;
       }
       args.splice(args.length-1, 1);
       if (args[0] === '-set') {
+         return wCTB.send('La opción **-set** ha sido deshabilitada, debes especificar el usuario de Ripple.')
+         .then(m => deleteMsg(m, 5000));
          if (!args[1]) {
             deleteMsg(msg, 5000);
-            msg.channel.send('Debes escribir el nombre de usuario que deseas predeterminar.')
+            wCTB.send('Debes escribir el nombre de usuario que deseas predeterminar.')
                .then(m => deleteMsg(m, 4500));
             return;
          }
@@ -155,7 +170,7 @@ module.exports = {
             let x = rippleInfo[0];
             bd.set(`ripple.ripple.${msg.author.id}.username`, x.username);
             bd.set(`ripple.ripple.${msg.author.id}.id`, x.user_id);
-            msg.channel.send(new RichEmbed()
+            wCTB.send(new RichEmbed()
                .setAuthor(pippi.user.username, pippi.user.displayAvatarURL)
                .setTitle('¡Listo!')
                .setThumbnail(msg.author.displayAvatarURL)
@@ -163,15 +178,17 @@ module.exports = {
                .addField('Nuevo nombre de usuario definido para Ripple', x.username)
                .setTimestamp())
                .then(m => deleteMsg(m, 5000));
-         }).catch(() => msg.channel.send(`Parece que el nombre de usuario **${username}** no existe en Ripple\n*Asegúrate de haberlo escrito bien.*`)
+         }).catch(() => wCTB.send(`Parece que el nombre de usuario **${username}** no existe en Ripple\n*Asegúrate de haberlo escrito bien.*`)
             .then(m => deleteMsg(m, 5000)));
          return;
       }
       if (!args[0]) {
+         return wCTB.send('Debes especificar un nombre de usuario de Ripple.')
+         .then(m => deleteMsg(m, 5000));
          let osuUser = await bd.fetch(`ripple.ripple.${msg.author.id}.username`);
          if (osuUser === null || osuUser === undefined) {
             deleteMsg(msg, 6000);
-            msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}ctb -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
+            wCTB.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}ctb -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
                .then(m => deleteMsg(m, 5500));
             return;
          }
@@ -193,7 +210,7 @@ module.exports = {
                .addField('Accuracy', (Math.round(x.accuracy * 100) / 100).toFixed(2)+'%', true)
                .addField('Conteo de jugadas', x.playcount, true)
                .setTimestamp();
-            msg.channel.send(embed);
+            wCTB.send(embed);
             });
          return;
       }
@@ -218,15 +235,17 @@ module.exports = {
                   .addField('Accuracy', (Math.round(x.accuracy * 100) / 100).toFixed(2)+'%', true)
                   .addField('Conteo de jugadas', x.playcount, true)
                   .setTimestamp();
-               msg.channel.send(embed);
-            }).catch(() => msg.channel.send(`No he podido encontrar a **${username}** en Ripple`)
+               wCTB.send(embed);
+            }).catch(() => wCTB.send(`No he podido encontrar a **${username}** en Ripple`)
                               .then(m => deleteMsg(m, 5000)));
          return;
       }
+      return wCTB.send('Debes especificar un nombre de usuario de Ripple.')
+      .then(m => deleteMsg(m, 5000));
       let ctbUser = await bd.fetch(`ripple.ripple.${member.id}.username`);
       if (ctbUser === null || ctbUser === undefined) {
          deleteMsg(msg, 5000);
-         msg.channel.send(`Parece que ${member} no tiene definido un usuario.`)
+         wCTB.send(`Parece que ${member} no tiene definido un usuario.`)
             .then(m => deleteMsg(m, 4500));
          return;
       }
@@ -248,7 +267,8 @@ module.exports = {
             .addField('Accuracy', (Math.round(x.accuracy * 100) / 100).toFixed(2)+'%', true)
             .addField('Conteo de jugadas', x.playcount, true)
             .setTimestamp();
-         msg.channel.send(embed);
+         wCTB.send(embed);
          });
+      });
    }
 }
