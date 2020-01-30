@@ -9,7 +9,9 @@ const osuApi = new nosu.Api(osu.key, { completeScores: true, notFoundAsError: tr
 
 module.exports = async (pippi, msg, args, mode) => {
    if (!args[1]) {
-      let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
+      return msg.channel.send('Debes especificar un nombre de usuario de osu!')
+      .then(m => deleteMsg(m, 5000));
+      var osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
       if (osuUser === null || osuUser === undefined) {
          deleteMsg(msg, 5000);
          msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${pippi.user} osu -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
@@ -19,13 +21,13 @@ module.exports = async (pippi, msg, args, mode) => {
       osuApi.getUser({ u: osuUser })
       .then(async user => await bd.set('user', { username: user.name, user_id: user.id, country: user.country }));
       osuApi.getUserBest({ u: osuUser, m: mode, limit: 20 }).then(async info => {
-         let page = 1;
-         let pages = [];
-         let imgs = [];
+         var page = 1;
+         var pages = [];
+         var imgs = [];
          if (info.length<20) var limit = info.length;
          else var limit = 20;
          for (i = 0; i < limit; i++) {
-         let rankE = info[i].rank === 'XH' ? osuE.XH : 
+         var rankE = info[i].rank === 'XH' ? osuE.XH : 
             info[i].rank === 'SH' ? osuE.SH :
             info[i].rank === 'X' ? osuE.X :
             info[i].rank === 'S' ? osuE.S :
@@ -33,11 +35,11 @@ module.exports = async (pippi, msg, args, mode) => {
             info[i].rank === 'B' ? osuE.B :
             info[i].rank === 'C' ? osuE.C :
             info[i].rank === 'F' ? osuE.D : '';
-         let info2 = info[i].beatmap;
+         var info2 = info[i].beatmap;
          osuApi.getUser({ u: info2.creator })
          .then(async creator => await bd.set('creator', creator.id));
-         let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapSetId}#osu/${info2.id})**`+
-         ` by [${info2.creator}](https://osu.ppy.sh/users/${bd.get('creator')}) [${info2.version}]`+
+         var desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapSetId}#osu/${info2.id})**`+
+         ` by [${info2.creator}](https://osu.ppy.sh/users/${creator.id}) [${info2.version}]`+
          `\n• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficulty.rating))+
 ` \`(${(Math.round(info2.difficulty.rating * 100) / 100).toFixed(2)}*)\``}
 • Obtuviste ${rankE}
@@ -60,19 +62,19 @@ module.exports = async (pippi, msg, args, mode) => {
       });
       return;
    }
-   let member = msg.mentions.members.filter(m => m.id !== pippi.user.id).first();
+   var member = msg.mentions.members.filter(m => m.id !== pippi.user.id).first();
    if (!member) {
-      let osuUser = args.slice(1).join(' ');
+      var osuUser = args.slice(1).join(' ');
       osuApi.getUser({ u: osuUser })
       .then(async user => await bd.set('user', { username: user.name, user_id: user.id, country: user.country }));
       osuApi.getUserBest({ u: osuUser, m: mode, limit: 20 }).then(async info => {
-         let page = 1;
-         let pages = [];
-         let imgs = [];
+         var page = 1;
+         var pages = [];
+         var imgs = [];
          if (info.length<20) var limit = info.length;
          else var limit = 20;
          for (i = 0; i < limit; i++) {
-         let rankE = info[i].rank === 'XH' ? osuE.XH : 
+         var rankE = info[i].rank === 'XH' ? osuE.XH : 
             info[i].rank === 'SH' ? osuE.SH :
             info[i].rank === 'X' ? osuE.X :
             info[i].rank === 'S' ? osuE.S :
@@ -80,10 +82,10 @@ module.exports = async (pippi, msg, args, mode) => {
             info[i].rank === 'B' ? osuE.B :
             info[i].rank === 'C' ? osuE.C :
             info[i].rank === 'F' ? osuE.D : '';
-         let info2 = info[i].beatmap;
+         var info2 = info[i].beatmap;
          osuApi.getUser({ u: info2.creator })
-         .then(async creator => await bd.set('creator', creator.id));
-         let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapSetId}#osu/${info2.id})**`+
+         .then(async creator => {await bd.set('creator', creator.id)});
+         var desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapSetId}#osu/${info2.id})**`+
          ` by [${info2.creator}](https://osu.ppy.sh/users/${bd.get('creator')}) [${info2.version}]`+
          `\n• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficulty.rating))+
 ` \`(${(Math.round(info2.difficulty.rating * 100) / 100).toFixed(2)}*)\``}
@@ -108,7 +110,9 @@ module.exports = async (pippi, msg, args, mode) => {
       .then(m => deleteMsg(m, 5000)));
       return;
    }
-   let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
+   return msg.channel.send('Debes especificar un nombre de usuario de osu!')
+   .then(m => deleteMsg(m, 5000));
+   var osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
    if (osuUser === null || osuUser === undefined) {
       deleteMsg(msg, 5000);
       msg.channel.send(`Parece que ${member} no tiene definido ningún nombre de usuario.`)
@@ -118,13 +122,13 @@ module.exports = async (pippi, msg, args, mode) => {
    osuApi.getUser({ u: osuUser })
    .then(async user => await bd.set('user', { username: user.name, user_id: user.id, country: user.country }));
    osuApi.getUserBest({ u: osuUser, m: mode, limit: 20 }).then(async info => {
-      let page = 1;
-      let pages = [];
-      let imgs = [];
+      var page = 1;
+      var pages = [];
+      var imgs = [];
       if (info.length<20) var limit = info.length;
          else var limit = 20;
       for (i = 0; i < limit; i++) {
-      let rankE = info[i].rank === 'XH' ? osuE.XH : 
+      var rankE = info[i].rank === 'XH' ? osuE.XH : 
          info[i].rank === 'SH' ? osuE.SH :
          info[i].rank === 'X' ? osuE.X :
          info[i].rank === 'S' ? osuE.S :
@@ -132,11 +136,11 @@ module.exports = async (pippi, msg, args, mode) => {
          info[i].rank === 'B' ? osuE.B :
          info[i].rank === 'C' ? osuE.C :
          info[i].rank === 'F' ? osuE.D : '';
-      let info2 = info[i].beatmap;
+      var info2 = info[i].beatmap;
       osuApi.getUser({ u: info2.creator })
       .then(async creator => await bd.set('creator', creator.id));
-      let desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapSetId}#osu/${info2.id})**`+
-      ` by [${info2.creator}](https://osu.ppy.sh/users/${bd.get('creator')}) [${info2.version}]`+
+      var desc = `**${i+1}.** **[${info2.title}](https://osu.ppy.sh/beatmapsets/${info2.beatmapSetId}#osu/${info2.id})**`+
+      ` by [${info2.creator}](https://osu.ppy.sh/users/${creator.id}) [${info2.version}]`+
       `\n• Dificultad: ${'⭐'.repeat(Math.floor(info2.difficulty.rating))+
 ` \`(${(Math.round(info2.difficulty.rating * 100) / 100).toFixed(2)}*)\``}
 • Obtuviste ${rankE}

@@ -1,6 +1,7 @@
 const { Client } = require('discord.js');
 const pippi = new Client();
 const { token, prefix } = require('./functions/settings');
+const imgur = require('./functions/imgur');
 
 require('./cmdHandler')(pippi);
 

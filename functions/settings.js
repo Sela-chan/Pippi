@@ -1,5 +1,5 @@
 module.exports = {
-   token: 'NjUyMjExNDAzNjgzMzk3NjQx.XjGPyw.WtzLEDO1mj49ZZenFP_XTgMdwQ8', // Private
+   token: 'NjUyMjExNDAzNjgzMzk3NjQx.XjLdhg.rjXNM0GrV7cvVsRJdIk-JRuA53c',
    prefix: pippi => {
       return `${pippi.user} `;
    },

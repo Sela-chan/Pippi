@@ -1,18 +1,17 @@
-const { RichEmbed, Client } = require('discord.js');
+const { RichEmbed } = require('discord.js');
 const bd = require('quick.db');
 const fetch = require('node-fetch');
 const deleteMsg = require('../functions/deleteMsg');
 const { osu } = require('../functions/settings');
 const { put } = require('../functions/misc');
-const pippi = new Client();
+const prefix = '@Pippi ';
 
 module.exports = {
    name: "osu",
    aliases: ['std'],
-   usage: `${`${pippi.user} `}osu [opciones] [búsqueda]`,
-   category: "osu!",
+   usage: `${prefix}osu [opciones] <usuario>`,
    perms: [],
-   description: `Información osu!Standard`,
+   desc: `Información osu!Standard`,
    run: async (pippi, msg, args) => {
       msg.content = msg.content.replace(/<@!652211403683397641>/g, '');
       if (args[args.length-1] !== '-ripple') {
@@ -59,7 +58,7 @@ module.exports = {
             let osuUser = await bd.fetch(`osu.osu.${msg.author.id}.username`);
             if (osuUser === null || osuUser === undefined) {
                deleteMsg(msg, 6000);
-               msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}osu -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
+               msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${prefix}osu -set <nombre de usuario>\` para definir tu nombre de usuario.*`)
                   .then(m => deleteMsg(m, 5500));
                return;
             }
@@ -181,7 +180,7 @@ module.exports = {
          let osuUser = await bd.fetch(`ripple.ripple.${msg.author.id}.username`);
          if (osuUser === null || osuUser === undefined) {
             deleteMsg(msg, 6000);
-            msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${`${pippi.user} `}osu -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
+            msg.channel.send(`No tienes definido ningún nombre de usuario.\n*Usa \`${prefix}osu -set <nombre de usuario> -ripple\` para definir tu nombre de usuario.*`)
                .then(m => deleteMsg(m, 5500));
             return;
          }
