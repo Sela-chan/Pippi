@@ -7,6 +7,21 @@ require('./cmdHandler')(pippi);
 
 pippi.on('ready', () => {
    console.log(`{ ${pippi.user.username} } connected successfully!`);
+   pippi.user.setStatus('idle');
+
+   let statuses = [
+      `osu!`
+   ];
+   let i = 0;
+   setInterval(function() {
+      let status = statuses[i];
+      Maika.user.setActivity(status, {
+         type: "STREAMING",
+         url: "https://www.twitch.tv/selavid"
+      });
+      i++;
+      if (i >= statuses.length) i = i - statuses.length;
+   }, 35000);
 });
 
 pippi.on('message', async msg => {
