@@ -10,7 +10,9 @@ pippi.on('ready', () => {
    pippi.user.setStatus('idle');
 
    let statuses = [
-      `osu!`
+      `osu!`,
+      `con +${pippi.users.size} usuarios!`,
+      `en ${pippi.guilds.size}`
    ];
    let i = 0;
    setInterval(function() {
