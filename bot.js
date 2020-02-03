@@ -12,7 +12,7 @@ pippi.on('ready', () => {
    let statuses = [
       `osu!`,
       `con +${pippi.users.size} usuarios!`,
-      `en ${pippi.guilds.size}`
+      `en ${pippi.guilds.size} servidores`
    ];
    let i = 0;
    setInterval(function() {
