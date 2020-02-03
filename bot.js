@@ -15,7 +15,7 @@ pippi.on('ready', () => {
    let i = 0;
    setInterval(function() {
       let status = statuses[i];
-      Maika.user.setActivity(status, {
+      pippi.user.setActivity(status, {
          type: "STREAMING",
          url: "https://www.twitch.tv/selavid"
       });
